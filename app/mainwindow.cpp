@@ -1,15 +1,11 @@
-#include <QtGui>
-#include <QMenuBar>
-#include <QFileDialog>
-#include <QMessageBox>
-
 #include "mainwindow.h"
 #include "touchwidget.h"
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
 {
-    scribbleArea = new TouchWidget;
-    setCentralWidget(scribbleArea);
+    _touchWidget = new TouchWidget;
+    setCentralWidget(_touchWidget);
 
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     setWindowState(Qt::WindowFullScreen);

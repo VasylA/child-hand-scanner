@@ -40,6 +40,8 @@ private slots:
     void checkTouchState();
 
 private:
+    static const int MIN_TOUCH_POINTS_COUNT = 2;
+    static const int RESET_SCAN_PERIOD = 5000;
     static const int FULL_SCAN_PERIOD = 8000;
 
     ScanState _scanState;

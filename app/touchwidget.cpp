@@ -35,7 +35,7 @@ bool TouchWidget::event(QEvent *event)
                 staticPointsCount++;
         }
 
-        if (staticPointsCount > 1)
+        if (staticPointsCount > MIN_TOUCH_POINTS_COUNT - 2)
             checkStateForEnoughPoints();
         else
             checkStateForNotEnoughPoints();
@@ -151,14 +151,14 @@ void TouchWidget::setScanState(const ScanState &scanState)
         setColor(Qt::green);
         emit scanFinished();
 
-        QTimer::singleShot(3000, this, SLOT(resetTouchState()));
+        QTimer::singleShot(RESET_SCAN_PERIOD , this, SLOT(resetTouchState()));
         break;
 
     case SS_Interrupted:
         setColor(Qt::red);
         emit scanInterrupted();
 
-        QTimer::singleShot(3000, this, SLOT(resetTouchState()));
+        QTimer::singleShot(RESET_SCAN_PERIOD , this, SLOT(resetTouchState()));
         break;
 
     default:

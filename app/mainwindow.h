@@ -11,10 +11,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow();
+    MainWindow(QWidget *parent = 0);
 
 private:
-    TouchWidget *scribbleArea;
+    TouchWidget *_touchWidget;
 };
 
 #endif // MAINWINDOW_H
