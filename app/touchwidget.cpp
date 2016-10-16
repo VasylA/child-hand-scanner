@@ -63,7 +63,10 @@ void TouchWidget::checkStateForEnoughPoints()
     {
     case SS_None:
         if (_scanTimer.isActive())
+        {
             _scanTimer.stop();
+            break;
+        }
         _scanTimer.start();
 
         setScanState(SS_Started);
@@ -90,13 +93,16 @@ void TouchWidget::checkStateForNotEnoughPoints()
     switch (_scanState)
     {
     case SS_None:
+        if (_scanTimer.isActive())
+            _scanTimer.stop();
         break;
 
     case SS_Started:
         if (_scanTimer.isActive())
+        {
+            _scanTimer.stop();
             setScanState(SS_Interrupted);
-        else
-            setScanState(SS_Finished);
+        }
         break;
 
     default:
@@ -104,13 +110,20 @@ void TouchWidget::checkStateForNotEnoughPoints()
     }
 }
 
+void TouchWidget::resetTouchState()
+{
+    setScanState(SS_None);
+}
+
 void TouchWidget::checkTouchState()
 {
     switch (_scanState)
     {
     case SS_Started:
-        _scanState = SS_Finished;
-        emit scanFinished();
+        if (_scanTimer.isActive())
+            break;
+
+        setScanState(SS_Finished);
         break;
 
     default:
@@ -137,11 +150,15 @@ void TouchWidget::setScanState(const ScanState &scanState)
     case SS_Finished:
         setColor(Qt::green);
         emit scanFinished();
+
+        QTimer::singleShot(3000, this, SLOT(resetTouchState()));
         break;
 
     case SS_Interrupted:
         setColor(Qt::red);
         emit scanInterrupted();
+
+        QTimer::singleShot(3000, this, SLOT(resetTouchState()));
         break;
 
     default:

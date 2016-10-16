@@ -36,10 +36,11 @@ private:
     void checkStateForNotEnoughPoints();
 
 private slots:
+    void resetTouchState();
     void checkTouchState();
 
 private:
-    static const int FULL_SCAN_PERIOD = 8;
+    static const int FULL_SCAN_PERIOD = 8000;
 
     ScanState _scanState;
 
