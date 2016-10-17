@@ -1,1 +1,9 @@
 child-hand-scanner
+
+TODO:
+1. Transparent hand image on background;
+2. State NONE: blue background with animation on color alpha;
+3. State STARTED: blue background with animation on scan line position;
+4. State INTERRUPTED: (blinking) red background (with cross image and may be with text like "Failed" or "Access denied");
+5. State FINISHED: green background (with accept image and may be with text like "Accepted" or "Access granted");
+6. Back to the state NONE on delay after INTERRUPTED and FINISHED.
