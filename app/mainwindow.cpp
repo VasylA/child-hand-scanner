@@ -1,23 +1,31 @@
 #include "mainwindow.h"
-#include "touchwidget.h"
+#include "scanwidget.h"
+#include "startwidget.h"
+#include "accessdeniedwidget.h"
+#include "accessgrantedwidget.h"
 
-#include <QPropertyAnimation>
-#include <QTouchEvent>
-#include <QPalette>
 #include <QColor>
+#include <QScreen>
+#include <QPalette>
+#include <QBoxLayout>
+#include <QTouchEvent>
+#include <QApplication>
+#include <QStackedWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-    _scanState(SS_None)
+    _scanState(SS_None),
+    _scanFrame(nullptr),
+    _startFrame(nullptr),
+    _loseFrame(nullptr),
+    _winFrame(nullptr),
+    _stackedWidget(nullptr)
 {
     setupWidgets();
 
-    _scanTimer.setInterval(FULL_SCAN_PERIOD);
-    _scanTimer.setSingleShot(true);
+    initTimer();
 
-    connect(&_scanTimer, SIGNAL(timeout()), SLOT(checkTouchState()));
-
-    setScanState(SS_None);
+    setInitialAppState();
 }
 
 MainWindow::ScanState MainWindow::scanState() const
@@ -28,32 +36,6 @@ MainWindow::ScanState MainWindow::scanState() const
 void MainWindow::setScanState(const MainWindow::ScanState &scanState)
 {
     _scanState = scanState;
-
-    switch (_scanState)
-    {
-    case SS_Started:
-        setColor(Qt::blue);
-        emit scanStarted();
-        break;
-
-    case SS_Finished:
-        setColor(Qt::green);
-        emit scanFinished();
-
-        QTimer::singleShot(RESET_SCAN_PERIOD , this, SLOT(resetTouchState()));
-        break;
-
-    case SS_Interrupted:
-        setColor(Qt::red);
-        emit scanInterrupted();
-
-        QTimer::singleShot(RESET_SCAN_PERIOD , this, SLOT(resetTouchState()));
-        break;
-
-    default:
-        setColor(Qt::white);
-        break;
-    }
 }
 
 bool MainWindow::event(QEvent *event)
@@ -73,10 +55,19 @@ bool MainWindow::event(QEvent *event)
         }
 
         if (staticPointsCount > MIN_TOUCH_POINTS_COUNT - 2)
-            checkStateForEnoughPoints();
+            reactOnTouchIfEnoughPoints();
         else
-            checkStateForNotEnoughPoints();
+            reactOnTouchIfNotEnoughPoints();
     }
+        break;
+
+
+    case QEvent::MouseButtonPress:
+        reactOnTouchIfEnoughPoints();
+        break;
+
+    case QEvent::MouseButtonRelease:
+        reactOnTouchIfNotEnoughPoints();
         break;
 
     default:
@@ -85,17 +76,54 @@ bool MainWindow::event(QEvent *event)
     return true;
 }
 
+void MainWindow::initTimer()
+{
+    _scanTimer.setInterval(FULL_SCAN_PERIOD);
+    _scanTimer.setSingleShot(true);
+
+    connect(&_scanTimer, SIGNAL(timeout()), this, SLOT(checkScanStateOInTimeOut()));
+}
+
 void MainWindow::setupWidgets()
 {
-//    _touchWidget = new TouchWidget;
-//    setCentralWidget(_touchWidget);
+    setupGameFrames();
+
+    _stackedWidget = new QStackedWidget;
+    _stackedWidget->addWidget(_startFrame);
+    _stackedWidget->addWidget(_scanFrame);
+    _stackedWidget->addWidget(_loseFrame);
+    _stackedWidget->addWidget(_winFrame);
+
+    setCentralWidget(_stackedWidget);
 
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-//    setWindowState(Qt::WindowFullScreen);
+    setWindowState(Qt::WindowFullScreen);
     setWindowTitle(tr("Hand Scanner"));
 
     setAttribute(Qt::WA_AcceptTouchEvents);
     setAttribute(Qt::WA_StaticContents);
+}
+
+void MainWindow::setupGameFrames()
+{
+    QSizeF availableScreenSize = qApp->primaryScreen()->availableSize();
+
+    const int TEXT_PIXEL_SIZE = availableScreenSize.height() / 5;
+
+    _startFrame = new StartWidget;
+    _startFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _startFrame->setTextSize(TEXT_PIXEL_SIZE);
+
+    _scanFrame = new ScanWidget;
+    _scanFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    _winFrame = new AccessGrantedWidget;
+    _winFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _winFrame->setTextSize(TEXT_PIXEL_SIZE);
+
+    _loseFrame = new AccessDeniedWidget;
+    _loseFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _loseFrame->setTextSize(TEXT_PIXEL_SIZE);
 }
 
 void MainWindow::setColor(QColor color)
@@ -119,76 +147,63 @@ void MainWindow::setColor(QColor color)
     setPalette(colorScheme);
 }
 
-void MainWindow::checkStateForEnoughPoints()
+void MainWindow::setInitialAppState()
 {
-    switch (_scanState)
-    {
-    case SS_None:
-        if (_scanTimer.isActive())
-        {
-            _scanTimer.stop();
-            break;
-        }
-        _scanTimer.start();
+    if (_scanState == SS_None)
+        return;
 
-        setScanState(SS_Started);
-        break;
+    if (_scanTimer.isActive())
+        _scanTimer.stop();
 
-    case SS_Started:
-        if (_scanTimer.isActive())
-        {
-            if (_scanTimer.remainingTime() > 0)
-                break;
+    _scanState = SS_None;
 
-            setScanState(SS_Finished);
-            break;
-        }
-        break;
-
-    default:
-        break;
-    }
+    if (_stackedWidget->currentWidget() != _startFrame)
+        _stackedWidget->setCurrentWidget(_startFrame);
 }
 
-void MainWindow::checkStateForNotEnoughPoints()
+void MainWindow::reactOnTouchIfEnoughPoints()
 {
-    switch (_scanState)
-    {
-    case SS_None:
-        if (_scanTimer.isActive())
-            _scanTimer.stop();
-        break;
+    if (_scanState != SS_None)
+        return;
 
-    case SS_Started:
-        if (_scanTimer.isActive())
-        {
-            _scanTimer.stop();
-            setScanState(SS_Interrupted);
-        }
-        break;
+    if (_scanTimer.isActive())
+        _scanTimer.stop();
 
-    default:
-        break;
-    }
+    _scanState = SS_Started;
+
+    if (_stackedWidget->currentWidget() != _scanFrame)
+        _stackedWidget->setCurrentWidget(_scanFrame);
+
+    _scanTimer.start(FULL_SCAN_PERIOD);
+    _scanFrame->startScanAnimation();
 }
 
-void MainWindow::resetTouchState()
+void MainWindow::reactOnTouchIfNotEnoughPoints()
 {
-    setScanState(SS_None);
+    if (_scanState != SS_Started)
+        return;
+
+    if (_scanTimer.isActive())
+        _scanTimer.stop();
+
+    _scanState = SS_Interrupted;
+
+    _stackedWidget->setCurrentWidget(_loseFrame);
+
+    QTimer::singleShot(RESET_SCAN_PERIOD, this, SLOT(setInitialAppState()));
 }
 
-void MainWindow::checkTouchState()
+void MainWindow::checkScanStateOInTimeOut()
 {
-    switch (_scanState)
-    {
-    case SS_Started:
-        if (_scanTimer.isActive())
-            break;
+    if (_scanState != SS_Started)
+        return;
 
-        setScanState(SS_Finished);
-        break;
+    if (_scanTimer.isActive())
+        _scanTimer.stop();
 
-    default:
-        break;
-    }
+    _scanState = SS_Finished;
+
+    _stackedWidget->setCurrentWidget(_winFrame);
+
+    QTimer::singleShot(RESET_SCAN_PERIOD, this, SLOT(setInitialAppState()));
 }

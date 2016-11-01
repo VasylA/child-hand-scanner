@@ -4,7 +4,12 @@
 #include <QMainWindow>
 #include <QTimer>
 
-class TouchWidget;
+class StartWidget;
+class ScanWidget;
+class AccessGrantedWidget;
+class AccessDeniedWidget;
+
+class QStackedWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -24,25 +29,29 @@ public:
     ScanState scanState() const;
     void setScanState(const ScanState &scanState);
 
-signals:
-    void scanStarted();
-    void scanFinished();
-    void scanInterrupted();
-
 
 protected:
     bool event(QEvent *event) override;
 
 
 private:
+    void initTimer();
+//    void initSoundPlayer();
+//    void initTestpointsController();
+
     void setupWidgets();
+    void setupGameFrames();
+
     void setColor(QColor color);
     void checkStateForEnoughPoints();
     void checkStateForNotEnoughPoints();
 
 private slots:
-    void resetTouchState();
-    void checkTouchState();
+    // Game State slots
+    void setInitialAppState();
+    void reactOnTouchIfEnoughPoints();
+    void reactOnTouchIfNotEnoughPoints();
+    void checkScanStateOInTimeOut();
 
 private:
     static const int MIN_TOUCH_POINTS_COUNT = 2;
@@ -52,7 +61,12 @@ private:
     ScanState _scanState;
     QTimer _scanTimer;
 
-    TouchWidget *_touchWidget;
+    ScanWidget         *_scanFrame;
+    StartWidget       *_startFrame;
+    AccessDeniedWidget *_loseFrame;
+    AccessGrantedWidget *_winFrame;
+    QStackedWidget *_stackedWidget;
+
 };
 
 #endif // MAINWINDOW_H

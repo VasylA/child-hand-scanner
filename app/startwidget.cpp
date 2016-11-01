@@ -1,4 +1,4 @@
-#include "startpuzzlewidget.h"
+#include "startwidget.h"
 
 #include <QLabel>
 #include <QLayout>
@@ -6,9 +6,9 @@
 #include <QRadialGradient>
 #include <QPropertyAnimation>
 
-const QString StartPuzzleWidget::labelText = "Пройти рівень";
+const QString StartWidget::labelText = "Пройти рівень";
 
-StartPuzzleWidget::StartPuzzleWidget(QWidget *parent)
+StartWidget::StartWidget(QWidget *parent)
     : QWidget(parent),
       _accessLabel(new QLabel),
       _backgroundAnimation(new QPropertyAnimation(this, "COLOR")),
@@ -21,7 +21,7 @@ StartPuzzleWidget::StartPuzzleWidget(QWidget *parent)
     runAnimation();
 }
 
-void StartPuzzleWidget::initUi()
+void StartWidget::initUi()
 {
     _accessLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     _accessLabel->setAlignment(Qt::AlignCenter);
@@ -34,7 +34,7 @@ void StartPuzzleWidget::initUi()
     updateUi();
 }
 
-void StartPuzzleWidget::runAnimation()
+void StartWidget::runAnimation()
 {
     if(_backgroundAnimation->state() == QAbstractAnimation::Running)
     {
@@ -53,19 +53,19 @@ void StartPuzzleWidget::runAnimation()
     _backgroundAnimation->start();
 }
 
-int StartPuzzleWidget::textSize() const
+int StartWidget::textSize() const
 {
     return _textSize;
 }
 
-void StartPuzzleWidget::setTextSize(int textSize)
+void StartWidget::setTextSize(int textSize)
 {
     _textSize = textSize;
 
     updateLabel();
 }
 
-void StartPuzzleWidget::updateUi()
+void StartWidget::updateUi()
 {
     QPoint widgetCenter(width() / 2, height() / 2);
 
@@ -91,7 +91,7 @@ void StartPuzzleWidget::updateUi()
     updateLabel();
 }
 
-void StartPuzzleWidget::updateLabel()
+void StartWidget::updateLabel()
 {
     QString htmlText = QString("<p style='font-size:%0px; font-family:verdana'><b>%1</b></p>")
             .arg(_textSize)
@@ -100,12 +100,12 @@ void StartPuzzleWidget::updateLabel()
     _accessLabel->setText(htmlText);
 }
 
-int StartPuzzleWidget::colorChannel() const
+int StartWidget::colorChannel() const
 {
     return _colorChannel;
 }
 
-void StartPuzzleWidget::setColorChannel(int colorChannel)
+void StartWidget::setColorChannel(int colorChannel)
 {
     _colorChannel = colorChannel;
 

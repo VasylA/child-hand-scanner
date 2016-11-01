@@ -1,13 +1,18 @@
-QT += core widgets
+QT += widgets
 
 CONFIG += c++11
 
 TARGET = handscanner
-TEMPLATE = app
 
-HEADERS       = mainwindow.h \
-                touchwidget.h
+HEADERS = mainwindow.h \
+          startwidget.h \
+          scanwidget.h \
+          accessgrantedwidget.h \
+          accessdeniedwidget.h
 
-SOURCES       = main.cpp \
-                mainwindow.cpp \
-                touchwidget.cpp
+SOURCES = main.cpp \
+          mainwindow.cpp \
+          startwidget.cpp \
+          scanwidget.cpp \
+          accessgrantedwidget.cpp \
+          accessdeniedwidget.cpp

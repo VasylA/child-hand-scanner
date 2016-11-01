@@ -1,19 +1,19 @@
-#ifndef STARTPUZZLEWIDGET_H
-#define STARTPUZZLEWIDGET_H
+#ifndef STARTWIDGET_H
+#define STARTWIDGET_H
 
 #include <QWidget>
 
 class QLabel;
 class QPropertyAnimation;
 
-class StartPuzzleWidget : public QWidget
+class StartWidget : public QWidget
 {
     Q_OBJECT
 
 public:
     Q_PROPERTY(qreal COLOR READ colorChannel WRITE setColorChannel)
 
-    explicit StartPuzzleWidget(QWidget *parent = 0);
+    explicit StartWidget(QWidget *parent = 0);
 
     int colorChannel() const;
     void setColorChannel(int colorChannel);
@@ -44,4 +44,4 @@ private:
     int _textSize;
 };
 
-#endif // STARTPUZZLEWIDGET_H
+#endif // STARTWIDGET_H

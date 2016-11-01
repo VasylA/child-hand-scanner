@@ -1,18 +1,20 @@
-#ifndef TOUCHWIDGET_H
-#define TOUCHWIDGET_H
+#ifndef SCANWIDGET_H
+#define SCANWIDGET_H
 
 #include <QWidget>
 
 class QPropertyAnimation;
 
-class TouchWidget : public QWidget
+class ScanWidget : public QWidget
 {
     Q_OBJECT
 
 public:
     Q_PROPERTY(qreal scanLinePos READ scanLinePos WRITE setScanLinePos)
 
-    TouchWidget(QWidget *parent = 0);
+    explicit ScanWidget(QWidget *parent = 0);
+
+    void startScanAnimation();
 
     qreal scanLinePos() const;
     void setScanLinePos(const qreal &scanLinePos); 
@@ -22,4 +24,4 @@ private:
     QPropertyAnimation *_scanAnimation;
 };
 
-#endif // TOUCHWIDGET_H
+#endif // SCANWIDGET_H

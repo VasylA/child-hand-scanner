@@ -1,8 +1,8 @@
-#include "touchwidget.h"
+#include "ScanWidget.h"
 
 #include <QPropertyAnimation>
 
-TouchWidget::TouchWidget(QWidget *parent)
+ScanWidget::ScanWidget(QWidget *parent)
     : QWidget(parent),
       _scanLinePos(0),
       _scanAnimation(nullptr)
@@ -13,12 +13,17 @@ TouchWidget::TouchWidget(QWidget *parent)
     _scanAnimation->setDuration(FULL_SCAN_PERIOD / 2);
 }
 
-qreal TouchWidget::scanLinePos() const
+void ScanWidget::startScanAnimation()
+{
+    _scanAnimation->start();
+}
+
+qreal ScanWidget::scanLinePos() const
 {
     return _scanLinePos;
 }
 
-void TouchWidget::setScanLinePos(const qreal &scanLinePos)
+void ScanWidget::setScanLinePos(const qreal &scanLinePos)
 {
     _scanLinePos = scanLinePos;
 
