@@ -4,11 +4,15 @@
 #include <QWidget>
 #include <QTimer>
 
+class QPropertyAnimation;
+
 class TouchWidget : public QWidget
 {
     Q_OBJECT
 
 public:
+    Q_PROPERTY(qreal scanLinePos READ scanLinePos WRITE setScanLinePos)
+
     enum ScanState
     {
         SS_None = 0,
@@ -22,18 +26,24 @@ public:
     ScanState scanState() const;
     void setScanState(const ScanState &scanState);
 
+    qreal scanLinePos() const;
+    void setScanLinePos(const qreal &scanLinePos);
+
 signals:
     void scanStarted();
     void scanFinished();
     void scanInterrupted();
 
+
 protected:
     bool event(QEvent *event) override;
+
 
 private:
     void setColor(QColor color);
     void checkStateForEnoughPoints();
     void checkStateForNotEnoughPoints();
+    QColor colorForState(const ScanState &scanState);
 
 private slots:
     void resetTouchState();
@@ -47,6 +57,8 @@ private:
     ScanState _scanState;
 
     QTimer _scanTimer;
+    qreal _scanLinePos;
+    QPropertyAnimation *_scanAnimation;
 };
 
 #endif // TOUCHWIDGET_H

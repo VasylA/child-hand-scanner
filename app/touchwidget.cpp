@@ -1,12 +1,15 @@
 #include "touchwidget.h"
 
+#include <QPropertyAnimation>
 #include <QTouchEvent>
 #include <QPalette>
 #include <QColor>
 
 TouchWidget::TouchWidget(QWidget *parent)
     : QWidget(parent),
-      _scanState(SS_None)
+      _scanState(SS_None),
+      _scanLinePos(0),
+      _scanAnimation(nullptr)
 {
     setAttribute(Qt::WA_AcceptTouchEvents);
     setAttribute(Qt::WA_StaticContents);
@@ -15,6 +18,9 @@ TouchWidget::TouchWidget(QWidget *parent)
     _scanTimer.setSingleShot(true);
 
     connect(&_scanTimer, SIGNAL(timeout()), SLOT(checkTouchState()));
+
+    _scanAnimation = new QPropertyAnimation(this, "scanLinePos");
+    _scanAnimation->setDuration(FULL_SCAN_PERIOD / 2);
 
     setScanState(SS_None);
 }
@@ -51,7 +57,20 @@ bool TouchWidget::event(QEvent *event)
 void TouchWidget::setColor(QColor color)
 {
     QPalette colorScheme(palette());
-    colorScheme.setColor(QPalette::Background, color);
+
+
+    QLinearGradient linearGradient;
+    linearGradient.setStart(0, 0);
+    linearGradient.setFinalStop(0, 1);
+    linearGradient.setColorAt(0, Qt::green);
+    linearGradient.setColorAt(0.4, Qt::green);
+    linearGradient.setColorAt(0.5, Qt::white);
+    linearGradient.setColorAt(0.6, Qt::green);
+    linearGradient.setColorAt(1, Qt::green);
+    linearGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+
+//    colorScheme.setColor(QPalette::Background, color);
+    colorScheme.setBrush(QPalette::Background, linearGradient);
 
     setAutoFillBackground(true);
     setPalette(colorScheme);
@@ -110,6 +129,14 @@ void TouchWidget::checkStateForNotEnoughPoints()
     }
 }
 
+QColor TouchWidget::colorForState(const TouchWidget::ScanState &scanState)
+{
+    switch (scanState)
+    {
+    SS_None
+    }
+}
+
 void TouchWidget::resetTouchState()
 {
     setScanState(SS_None);
@@ -129,6 +156,18 @@ void TouchWidget::checkTouchState()
     default:
         break;
     }
+}
+
+qreal TouchWidget::scanLinePos() const
+{
+    return _scanLinePos;
+}
+
+void TouchWidget::setScanLinePos(const qreal &scanLinePos)
+{
+    _scanLinePos = scanLinePos;
+
+    setColor();
 }
 
 TouchWidget::ScanState TouchWidget::scanState() const
