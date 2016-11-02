@@ -18,7 +18,8 @@ ScanWidget::ScanWidget(QWidget *parent)
 
 void ScanWidget::startScanAnimation()
 {
-    stopScanAnimation();
+    if (_scanAnimation->state() == QAbstractAnimation::Running)
+        _scanAnimation->stop();
 
     QAbstractAnimation::Direction newDirection = (_scanAnimation->direction() == QAbstractAnimation::Forward) ? QAbstractAnimation::Backward
                                                                                                               : QAbstractAnimation::Forward;
@@ -34,6 +35,8 @@ void ScanWidget::stopScanAnimation()
 {
     if (_scanAnimation->state() == QAbstractAnimation::Running)
         _scanAnimation->stop();
+
+    _scanAnimation->setDirection(QAbstractAnimation::Backward);
 }
 
 qreal ScanWidget::scanLinePos() const

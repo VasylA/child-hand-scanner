@@ -97,7 +97,7 @@ void MainWindow::setupWidgets()
     setCentralWidget(_stackedWidget);
 
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-//    setWindowState(Qt::WindowFullScreen);
+    setWindowState(Qt::WindowFullScreen);
     setWindowTitle(tr("Hand Scanner"));
 
     setAttribute(Qt::WA_AcceptTouchEvents);
@@ -106,7 +106,7 @@ void MainWindow::setupWidgets()
 
 void MainWindow::setupGameFrames()
 {
-    QSizeF availableScreenSize = size();//qApp->primaryScreen()->availableSize();
+    QSizeF availableScreenSize = qApp->primaryScreen()->availableSize();
 
     const int TEXT_PIXEL_SIZE = availableScreenSize.height() / 5;
 
