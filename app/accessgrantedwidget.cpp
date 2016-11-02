@@ -36,7 +36,7 @@ void AccessGrantedWidget::initUi()
 
 void AccessGrantedWidget::runAnimation()
 {
-    if(_backgroundAnimation->state() == QAbstractAnimation::Running)
+    if (_backgroundAnimation->state() == QAbstractAnimation::Running)
     {
         _backgroundAnimation->stop();
         return;

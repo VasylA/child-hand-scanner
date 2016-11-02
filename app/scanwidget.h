@@ -14,15 +14,25 @@ public:
 
     explicit ScanWidget(QWidget *parent = 0);
 
-    void startScanAnimation();
-
     qreal scanLinePos() const;
     void setScanLinePos(const qreal &scanLinePos); 
+
+    QColor baseColor() const;
+    void setBaseColor(const QColor &baseColor);
+
+    int fullScanPeriod() const;
+    void setFullScanPeriod(int fullScanPeriod);
+
+public slots:
+    void startScanAnimation();
+    void stopScanAnimation();
+
 
 private:
     void updateUi();
 
 private:
+    int _fullScanPeriod;
     qreal _scanLinePos;
     QColor _baseColor;
     QPropertyAnimation *_scanAnimation;

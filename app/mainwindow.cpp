@@ -97,7 +97,7 @@ void MainWindow::setupWidgets()
     setCentralWidget(_stackedWidget);
 
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    setWindowState(Qt::WindowFullScreen);
+//    setWindowState(Qt::WindowFullScreen);
     setWindowTitle(tr("Hand Scanner"));
 
     setAttribute(Qt::WA_AcceptTouchEvents);
@@ -106,7 +106,7 @@ void MainWindow::setupWidgets()
 
 void MainWindow::setupGameFrames()
 {
-    QSizeF availableScreenSize = qApp->primaryScreen()->availableSize();
+    QSizeF availableScreenSize = size();//qApp->primaryScreen()->availableSize();
 
     const int TEXT_PIXEL_SIZE = availableScreenSize.height() / 5;
 
@@ -116,6 +116,7 @@ void MainWindow::setupGameFrames()
 
     _scanFrame = new ScanWidget;
     _scanFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _scanFrame->setFullScanPeriod(FULL_SCAN_PERIOD);
 
     _winFrame = new AccessGrantedWidget;
     _winFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -162,6 +163,7 @@ void MainWindow::reactOnTouchIfNotEnoughPoints()
     if (_scanState != SS_Started)
         return;
 
+    _scanFrame->stopScanAnimation();
     if (_scanTimer.isActive())
         _scanTimer.stop();
 
@@ -177,6 +179,7 @@ void MainWindow::checkScanStateOInTimeOut()
     if (_scanState != SS_Started)
         return;
 
+    _scanFrame->stopScanAnimation();
     if (_scanTimer.isActive())
         _scanTimer.stop();
 

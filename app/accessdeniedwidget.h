@@ -8,6 +8,7 @@ class QLabel;
 class AccessDeniedWidget : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit AccessDeniedWidget(QWidget *parent = 0);
 

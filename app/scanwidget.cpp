@@ -4,18 +4,36 @@
 
 ScanWidget::ScanWidget(QWidget *parent)
     : QWidget(parent),
+      _fullScanPeriod(10000),
       _scanLinePos(0),
+      _baseColor(100, 0, 150),
       _scanAnimation(nullptr)
 {
-    const int FULL_SCAN_PERIOD = 10;
-
     _scanAnimation = new QPropertyAnimation(this, "scanLinePos");
-    _scanAnimation->setDuration(FULL_SCAN_PERIOD / 2);
+    _scanAnimation->setDirection(QAbstractAnimation::Backward);
+    _scanAnimation->setDuration(_fullScanPeriod / 2);
+
+    connect(_scanAnimation, SIGNAL(finished()), SLOT(startScanAnimation()));
 }
 
 void ScanWidget::startScanAnimation()
 {
+    stopScanAnimation();
+
+    QAbstractAnimation::Direction newDirection = (_scanAnimation->direction() == QAbstractAnimation::Forward) ? QAbstractAnimation::Backward
+                                                                                                              : QAbstractAnimation::Forward;
+    _scanAnimation->setStartValue(0.0);
+    _scanAnimation->setEndValue(1.0);
+    _scanAnimation->setDirection(newDirection);
+    _scanAnimation->setDuration(_fullScanPeriod / 2);
+
     _scanAnimation->start();
+}
+
+void ScanWidget::stopScanAnimation()
+{
+    if (_scanAnimation->state() == QAbstractAnimation::Running)
+        _scanAnimation->stop();
 }
 
 qreal ScanWidget::scanLinePos() const
@@ -37,15 +55,39 @@ void ScanWidget::updateUi()
     QLinearGradient linearGradient;
     linearGradient.setStart(0, 0);
     linearGradient.setFinalStop(0, 1);
-    linearGradient.setColorAt(0, Qt::green);
-    linearGradient.setColorAt(_scanLinePos - 0.1,  Qt::green);
+
+    linearGradient.setColorAt(0,   _baseColor);
+    if (_scanLinePos >= 0.1)
+        linearGradient.setColorAt(_scanLinePos - 0.1,   _baseColor);
     linearGradient.setColorAt(_scanLinePos, Qt::white);
-    linearGradient.setColorAt(_scanLinePos + 0.1, Qt::green);
-    linearGradient.setColorAt(1, Qt::green);
+    if (_scanLinePos <= 0.9)
+        linearGradient.setColorAt(_scanLinePos + 0.1,   _baseColor);
+    linearGradient.setColorAt(1,   _baseColor);
+
     linearGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
 
     colorScheme.setBrush(QPalette::Background, linearGradient);
 
     setAutoFillBackground(true);
     setPalette(colorScheme);
+}
+
+int ScanWidget::fullScanPeriod() const
+{
+    return _fullScanPeriod;
+}
+
+void ScanWidget::setFullScanPeriod(int fullScanPeriod)
+{
+    _fullScanPeriod = fullScanPeriod;
+}
+
+QColor ScanWidget::baseColor() const
+{
+    return _baseColor;
+}
+
+void ScanWidget::setBaseColor(const QColor &baseColor)
+{
+    _baseColor = baseColor;
 }

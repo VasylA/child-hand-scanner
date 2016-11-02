@@ -36,7 +36,7 @@ void StartWidget::initUi()
 
 void StartWidget::runAnimation()
 {
-    if(_backgroundAnimation->state() == QAbstractAnimation::Running)
+    if (_backgroundAnimation->state() == QAbstractAnimation::Running)
     {
         _backgroundAnimation->stop();
         return;
