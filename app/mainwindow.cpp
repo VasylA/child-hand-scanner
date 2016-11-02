@@ -126,27 +126,6 @@ void MainWindow::setupGameFrames()
     _loseFrame->setTextSize(TEXT_PIXEL_SIZE);
 }
 
-void MainWindow::setColor(QColor color)
-{
-    QPalette colorScheme(palette());
-
-    QLinearGradient linearGradient;
-    linearGradient.setStart(0, 0);
-    linearGradient.setFinalStop(0, 1);
-    linearGradient.setColorAt(0, Qt::green);
-    linearGradient.setColorAt(0.4, Qt::green);
-    linearGradient.setColorAt(0.5, Qt::white);
-    linearGradient.setColorAt(0.6, Qt::green);
-    linearGradient.setColorAt(1, Qt::green);
-    linearGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-
-//    colorScheme.setColor(QPalette::Background, color);
-    colorScheme.setBrush(QPalette::Background, linearGradient);
-
-    setAutoFillBackground(true);
-    setPalette(colorScheme);
-}
-
 void MainWindow::setInitialAppState()
 {
     if (_scanState == SS_None)

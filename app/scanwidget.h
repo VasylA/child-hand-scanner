@@ -20,7 +20,11 @@ public:
     void setScanLinePos(const qreal &scanLinePos); 
 
 private:
+    void updateUi();
+
+private:
     qreal _scanLinePos;
+    QColor _baseColor;
     QPropertyAnimation *_scanAnimation;
 };
 

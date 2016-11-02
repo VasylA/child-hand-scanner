@@ -42,10 +42,6 @@ private:
     void setupWidgets();
     void setupGameFrames();
 
-    void setColor(QColor color);
-    void checkStateForEnoughPoints();
-    void checkStateForNotEnoughPoints();
-
 private slots:
     // Game State slots
     void setInitialAppState();
