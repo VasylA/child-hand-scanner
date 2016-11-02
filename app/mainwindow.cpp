@@ -44,30 +44,22 @@ bool MainWindow::event(QEvent *event)
     {
     case QEvent::TouchBegin:
     case QEvent::TouchUpdate:
-    case QEvent::TouchEnd:
     {
-        int staticPointsCount = 0;
         QList<QTouchEvent::TouchPoint> touchPoints = static_cast<QTouchEvent *>(event)->touchPoints();
-        foreach (const QTouchEvent::TouchPoint &touchPoint, touchPoints)
-        {
-            if (touchPoint.state() == Qt::TouchPointStationary)
-                staticPointsCount++;
-        }
 
-        if (staticPointsCount > MIN_TOUCH_POINTS_COUNT - 2)
+        if (touchPoints.count() >= MIN_TOUCH_POINTS_COUNT)
             reactOnTouchIfEnoughPoints();
-        else
-            reactOnTouchIfNotEnoughPoints();
     }
         break;
 
+    case QEvent::TouchCancel:
+    case QEvent::TouchEnd:
+    {
+        QList<QTouchEvent::TouchPoint> touchPoints = static_cast<QTouchEvent *>(event)->touchPoints();
 
-    case QEvent::MouseButtonPress:
-        reactOnTouchIfEnoughPoints();
-        break;
-
-    case QEvent::MouseButtonRelease:
-        reactOnTouchIfNotEnoughPoints();
+        if (touchPoints.count() < MIN_TOUCH_POINTS_COUNT)
+            reactOnTouchIfNotEnoughPoints();
+    }
         break;
 
     default:
