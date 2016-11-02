@@ -60,11 +60,11 @@ void ScanWidget::updateUi()
     linearGradient.setFinalStop(0, 1);
 
     linearGradient.setColorAt(0,   _baseColor);
-    if (_scanLinePos >= 0.1)
-        linearGradient.setColorAt(_scanLinePos - 0.1,   _baseColor);
+    if (_scanLinePos >= 0.03)
+        linearGradient.setColorAt(_scanLinePos - 0.03,   _baseColor);
     linearGradient.setColorAt(_scanLinePos, Qt::white);
-    if (_scanLinePos <= 0.9)
-        linearGradient.setColorAt(_scanLinePos + 0.1,   _baseColor);
+    if (_scanLinePos <= 0.97)
+        linearGradient.setColorAt(_scanLinePos + 0.03,   _baseColor);
     linearGradient.setColorAt(1,   _baseColor);
 
     linearGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
