@@ -4,6 +4,8 @@
 #include "accessdeniedwidget.h"
 #include "accessgrantedwidget.h"
 
+#include "testpointscontroller.h"
+
 #include <QColor>
 #include <QScreen>
 #include <QPalette>
@@ -12,6 +14,11 @@
 #include <QApplication>
 #include <QStackedWidget>
 
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QMediaPlaylist>
+
+QString MainWindow::soundsDirPath = "";
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     _scanState(SS_None),
@@ -19,11 +26,19 @@ MainWindow::MainWindow(QWidget *parent)
     _startFrame(nullptr),
     _loseFrame(nullptr),
     _winFrame(nullptr),
-    _stackedWidget(nullptr)
+    _stackedWidget(nullptr),
+    _testpointsController(nullptr),
+    _soundPlayer(nullptr)
 {
+    soundsDirPath = QApplication::applicationDirPath() + "/sounds/";
+
     setupWidgets();
 
     initTimer();
+
+    initSoundPlayer();
+
+    initTestpointsController();
 
     setInitialAppState();
 }
@@ -65,6 +80,7 @@ bool MainWindow::event(QEvent *event)
     default:
         return QWidget::event(event);
     }
+    setCursor(Qt::BlankCursor);
     return true;
 }
 
@@ -74,6 +90,17 @@ void MainWindow::initTimer()
     _scanTimer.setSingleShot(true);
 
     connect(&_scanTimer, SIGNAL(timeout()), this, SLOT(checkScanStateOInTimeOut()));
+}
+
+void MainWindow::initSoundPlayer()
+{
+    _soundPlayer = new QMediaPlayer(this);
+    _soundPlayer->setVolume(80);
+}
+
+void MainWindow::initTestpointsController()
+{
+    _testpointsController = new TestpointsController(this);
 }
 
 void MainWindow::setupWidgets()
@@ -88,6 +115,7 @@ void MainWindow::setupWidgets()
 
     setCentralWidget(_stackedWidget);
 
+    setCursor(Qt::BlankCursor);
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     setWindowState(Qt::WindowFullScreen);
     setWindowTitle(tr("Hand Scanner"));
@@ -127,10 +155,14 @@ void MainWindow::setInitialAppState()
     if (_scanTimer.isActive())
         _scanTimer.stop();
 
+    _soundPlayer->stop();
+
     _scanState = SS_None;
 
     if (_stackedWidget->currentWidget() != _startFrame)
         _stackedWidget->setCurrentWidget(_startFrame);
+
+    _testpointsController->resetOutGpiosStatus();
 }
 
 void MainWindow::reactOnTouchIfEnoughPoints()
@@ -141,10 +173,14 @@ void MainWindow::reactOnTouchIfEnoughPoints()
     if (_scanTimer.isActive())
         _scanTimer.stop();
 
+    _soundPlayer->stop();
+
     _scanState = SS_Started;
 
     if (_stackedWidget->currentWidget() != _scanFrame)
         _stackedWidget->setCurrentWidget(_scanFrame);
+
+    _testpointsController->resetOutGpiosStatus();
 
     _scanTimer.start(FULL_SCAN_PERIOD);
     _scanFrame->startScanAnimation();
@@ -159,9 +195,22 @@ void MainWindow::reactOnTouchIfNotEnoughPoints()
     if (_scanTimer.isActive())
         _scanTimer.stop();
 
+    _soundPlayer->stop();
+
     _scanState = SS_Interrupted;
 
     _stackedWidget->setCurrentWidget(_loseFrame);
+
+    QMediaPlaylist *playlist = new QMediaPlaylist(_soundPlayer);
+    playlist->addMedia(QUrl::fromLocalFile(soundsDirPath + "laser_fail.mp3"));
+    playlist->setPlaybackMode(QMediaPlaylist::Loop);
+    playlist->setCurrentIndex(0);
+
+    _soundPlayer->setPlaylist(playlist);
+    _soundPlayer->play();
+
+
+    _testpointsController->sendScanIncompeteSignalToOutGpios();
 
     QTimer::singleShot(RESET_SCAN_PERIOD, this, SLOT(setInitialAppState()));
 }
@@ -175,9 +224,13 @@ void MainWindow::checkScanStateOInTimeOut()
     if (_scanTimer.isActive())
         _scanTimer.stop();
 
+    _soundPlayer->stop();
+
     _scanState = SS_Finished;
 
     _stackedWidget->setCurrentWidget(_winFrame);
+
+    _testpointsController->sendScanCompeteSignalToOutGpios();
 
     QTimer::singleShot(RESET_SCAN_PERIOD, this, SLOT(setInitialAppState()));
 }

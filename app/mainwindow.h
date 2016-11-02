@@ -8,8 +8,10 @@ class StartWidget;
 class ScanWidget;
 class AccessGrantedWidget;
 class AccessDeniedWidget;
+class TestpointsController;
 
 class QStackedWidget;
+class QMediaPlayer;
 
 class MainWindow : public QMainWindow
 {
@@ -36,8 +38,8 @@ protected:
 
 private:
     void initTimer();
-//    void initSoundPlayer();
-//    void initTestpointsController();
+    void initSoundPlayer();
+    void initTestpointsController();
 
     void setupWidgets();
     void setupGameFrames();
@@ -54,6 +56,8 @@ private:
     static const int RESET_SCAN_PERIOD = 5000;
     static const int FULL_SCAN_PERIOD = 8000;
 
+    static QString soundsDirPath;
+
     ScanState _scanState;
     QTimer _scanTimer;
 
@@ -63,6 +67,9 @@ private:
     AccessGrantedWidget *_winFrame;
     QStackedWidget *_stackedWidget;
 
+    TestpointsController *_testpointsController;
+
+    QMediaPlayer *_soundPlayer;
 };
 
 #endif // MAINWINDOW_H

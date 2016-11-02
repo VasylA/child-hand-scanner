@@ -22,13 +22,13 @@ void TestpointsController::resetOutGpiosStatus()
     _gpio17.setval_gpio("0");
 }
 
-void TestpointsController::sendPuzzleCompeteSignalToOutGpios()
+void TestpointsController::sendScanCompeteSignalToOutGpios()
 {
     _gpio4.setval_gpio("1");
     _gpio17.setval_gpio("0");
 }
 
-void TestpointsController::sendPuzzleIncompeteSignalToOutGpios()
+void TestpointsController::sendScanIncompeteSignalToOutGpios()
 {
     _gpio4.setval_gpio("0");
     _gpio17.setval_gpio("1");

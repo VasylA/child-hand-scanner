@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/sound">
+        <file>sounds/laser_fail.mp3</file>
+    </qresource>
+</RCC>

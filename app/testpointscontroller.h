@@ -16,8 +16,8 @@ public:
 public slots:
     void checkInGpioStatus();
     void resetOutGpiosStatus();
-    void sendPuzzleCompeteSignalToOutGpios();
-    void sendPuzzleIncompeteSignalToOutGpios();
+    void sendScanCompeteSignalToOutGpios();
+    void sendScanIncompeteSignalToOutGpios();
 
 signals:
     void initialAppStateRequested();
@@ -32,8 +32,6 @@ private:
     GPIOClass _gpio5;
     GPIOClass _gpio6;
     GPIOClass _gpio17;
-
-//    QTimer _statusCheckTimer;
 
     static const int STATUS_CHECK_PERIOD = 300;
 };
